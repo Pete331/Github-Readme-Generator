@@ -1,5 +1,6 @@
 const fs = require("fs");
 const api = require("./utils/api.js");
+const generateMarkdown = require("./utils/generateMarkdown.js");
 const axios = require("axios");
 const inquirer = require("inquirer");
 
@@ -20,14 +21,6 @@ async function init() {
     const queryResponse = await axios.get(queryURL);
     // console.log(queryResponse.data);
 
-    // store required responses in object
-    const userInfo = {
-      user: user.username,
-      email: queryResponse.data.avatar_url.email,
-      profilePic: queryResponse.data.avatar_url,
-    };
-    // console.log(userInfo);
-
     // gets the list of repo's associated with user profile and stores in an array
     const repoResponse = await axios.get(repoURL);
     const repoArray = repoResponse.data.map((repo) => repo.name);
@@ -35,18 +28,47 @@ async function init() {
 
     // run the questions1 function and stores response in a checkbox Array for what to include in README
     const answers1 = await askQuestions1(repoArray);
-    const checkboxArray = answers1["checkbox-options"];
+    const checkboxArray = answers1.checkboxoptions;
     console.log(checkboxArray);
 
     // loops through the selected requirments and pushes to a toPrintArray(commented out currently) | this also ammends the answers1 array with user input for each checkbox
     // const toPrintArray = [];
     for (let i = 0; i < checkboxArray.length; i++) {
       checkboxArray[i] = await askQuestions2(checkboxArray[i]);
-    //   toPrintArray.push(checkboxArray[i]);
+      //   toPrintArray.push(checkboxArray[i]);
     }
-    console.log(userInfo);
-    console.log(answers1);
+    // console.log(userInfo);
+    // console.log(answers1.checkboxoptions);
     // console.log(toPrintArray);
+
+    // added all to this array for ease - can change back if checkbox objects dont populate
+    // store required responses in object
+    const userInfo = {
+      user: user.username,
+      email: queryResponse.data.avatar_url.email,
+      profilePic: queryResponse.data.avatar_url,
+      answers1,
+    };
+
+    // creates directory to save README.md file in
+    fs.mkdir(`./${user.username}`, function (err) {
+      if (err) {
+        throw err;
+      }
+    });
+    // creates README.md file
+    fs.writeFile(
+      `./${user.username}/README.md`,
+      generateMarkdown(userInfo),
+      function (err) {
+        if (err) {
+          throw err;
+        }
+        console.log("you have saved the README.md :)");
+      }
+    );
+
+    // generateMarkdown(userInfo);
   } catch (err) {
     console.log(err);
   }
@@ -72,18 +94,18 @@ function askQuestions1(repoArray) {
     {
       type: "input",
       message: "What Would you like the Title to be?",
-      name: "title",
+      name: "Title",
     },
     {
       type: "input",
       message: "Add a decription:",
-      name: "description",
+      name: "Description",
     },
     {
       type: "checkbox",
       message:
         "Which of the following would you like included in your README.md file?",
-      name: "checkbox-options",
+      name: "checkboxoptions",
       choices: [
         "Table of Contents",
         "Installation",
@@ -91,6 +113,7 @@ function askQuestions1(repoArray) {
         "License",
         "Contributing",
         "Tests",
+        "Questions",
       ],
     },
   ]);
@@ -99,17 +122,15 @@ function askQuestions1(repoArray) {
 // tailered lot of questions depending on what the user selected to include
 function askQuestions2(checkboxArray) {
   if (checkboxArray.includes("Table of Contents")) {
-    // checkboxArray.shift();
     return inquirer.prompt([
       {
         type: "input",
         message: `What would you like in your Table of Contents?`,
-        name: "Table of Contents",
+        name: "Table Of Contents",
       },
     ]);
   }
   if (checkboxArray.includes("Installation")) {
-    // checkboxArray.shift();
     return inquirer.prompt([
       {
         type: "input",
@@ -119,7 +140,6 @@ function askQuestions2(checkboxArray) {
     ]);
   }
   if (checkboxArray.includes("Usage")) {
-    // checkboxArray.shift();
     return inquirer.prompt([
       {
         type: "input",
@@ -129,17 +149,15 @@ function askQuestions2(checkboxArray) {
     ]);
   }
   if (checkboxArray.includes("License")) {
-    // checkboxArray.shift();
     return inquirer.prompt([
       {
-        type: "input",
+        type: "nput",
         message: `What would you like in your License?`,
         name: "License",
       },
     ]);
   }
   if (checkboxArray.includes("Contributing")) {
-    // checkboxArray.shift();
     return inquirer.prompt([
       {
         type: "input",
@@ -149,12 +167,20 @@ function askQuestions2(checkboxArray) {
     ]);
   }
   if (checkboxArray.includes("Tests")) {
-    // checkboxArray.shift();
     return inquirer.prompt([
       {
         type: "input",
         message: `What would you like in your Tests?`,
         name: "Tests",
+      },
+    ]);
+  }
+  if (checkboxArray.includes("Questions")) {
+    return inquirer.prompt([
+      {
+        type: "input",
+        message: `What would you like in your Questions?`,
+        name: "Questions",
       },
     ]);
   }
