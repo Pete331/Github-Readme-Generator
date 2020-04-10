@@ -29,19 +29,16 @@ async function init() {
     // run the questions1 function and stores response in a checkbox Array for what to include in README
     const answers1 = await askQuestions1(repoArray);
     const checkboxArray = answers1.checkboxoptions;
-    console.log(checkboxArray);
+    // console.log(checkboxArray);
 
-    // loops through the selected requirments and pushes to a toPrintArray(commented out currently) | this also ammends the answers1 array with user input for each checkbox
-    // const toPrintArray = [];
+    // creates checkboxArray and adds the selected checkboxoptions to it that were selected
     for (let i = 0; i < checkboxArray.length; i++) {
       checkboxArray[i] = await askQuestions2(checkboxArray[i]);
       //   toPrintArray.push(checkboxArray[i]);
     }
     // console.log(userInfo);
     // console.log(answers1.checkboxoptions);
-    // console.log(toPrintArray);
 
-    // added all to this array for ease - can change back if checkbox objects dont populate
     // store required responses in object
     const userInfo = {
       user: user.username,
@@ -51,14 +48,14 @@ async function init() {
     };
 
     // creates directory to save README.md file in
-    fs.mkdir(`./${user.username}`, function (err) {
+    fs.mkdir(`./${user.username}(${answers1.repo})`, function (err) {
       if (err) {
         throw err;
       }
     });
     // creates README.md file
     fs.writeFile(
-      `./${user.username}/README.md`,
+      `./${user.username}(${answers1.repo})/README.md`,
       generateMarkdown(userInfo),
       function (err) {
         if (err) {
@@ -74,7 +71,7 @@ async function init() {
   }
 }
 
-//initial inquirer function that asks for username
+//initial inquirer function that asks for github username
 function askUser() {
   return inquirer.prompt({
     message: "Enter your GitHub username",
@@ -126,7 +123,7 @@ function askQuestions2(checkboxArray) {
       {
         type: "input",
         message: `What would you like in your Table of Contents?`,
-        name: "Table Of Contents",
+        name: "Table of Contents",
       },
     ]);
   }
@@ -151,7 +148,7 @@ function askQuestions2(checkboxArray) {
   if (checkboxArray.includes("License")) {
     return inquirer.prompt([
       {
-        type: "nput",
+        type: "input",
         message: `What would you like in your License?`,
         name: "License",
       },
