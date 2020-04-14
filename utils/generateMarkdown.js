@@ -1,49 +1,49 @@
 function generateMarkdown(data) {
-  const optionsArray = data.answers1.checkboxoptions;
-
-  // converts optionsArray to optionsObj - array into an object to use
-  let optionsObj = {};
-  optionsArray.forEach((element) => {
-    console.log(element);
-    Object.assign(optionsObj, element);
-  });
-
   // console.log(data);
-  // console.log(optionsObj);
 
-  // sets all the variables that will be diplayed in the markdown file
+  // sets all the variables that will be displayed in the markdown file
   const user = data.user;
-  const repo = data.answers1.repo
+  const repo = data.answers1.repo;
   const email = data.email;
   const profilePic = data.profilePic;
+  // stores a boolean variable - if table of contents is selected or not
+  const tocInclude = data.answers1.checkboxoptions.includes(
+    "Table of Contents"
+  );
+
   const title = data.answers1.Title;
   const description = data.answers1.Description;
-  const tocHeading = checkUndefinedHeading(
-    optionsObj,
-    optionsObj["Table of Contents"]
-  );
-  const toc = checkUndefined(optionsObj["Table of Contents"]);
   const installationHeading = checkUndefinedHeading(
-    optionsObj,
-    optionsObj.Installation
+    data.answers1,
+    data.answers1.Installation
   );
-  const installation = checkUndefined(optionsObj.Installation);
-  const usageHeading = checkUndefinedHeading(optionsObj, optionsObj.Usage);
-  const usage = checkUndefined(optionsObj.Usage);
-  const lisenceHeading = checkUndefinedHeading(optionsObj, optionsObj.License);
-  const lisence = checkUndefined(optionsObj.License);
+  const installation = checkUndefined(data.answers1.Installation);
+  const usageHeading = checkUndefinedHeading(
+    data.answers1,
+    data.answers1.Usage
+  );
+  const usage = checkUndefined(data.answers1.Usage);
+  const lisenceHeading = checkUndefinedHeading(
+    data.answers1,
+    data.answers1.License
+  );
+  const lisence = checkUndefined(data.answers1.License);
   const contributingHeading = checkUndefinedHeading(
-    optionsObj,
-    optionsObj.Contributing
+    data.answers1,
+    data.answers1.Contributing
   );
-  const contributing = checkUndefined(optionsObj.Contributing);
-  const testsHeading = checkUndefinedHeading(optionsObj, optionsObj.Tests);
-  const tests = checkUndefined(optionsObj.Tests);
+  const contributing = checkUndefined(data.answers1.Contributing);
+  const testsHeading = checkUndefinedHeading(
+    data.answers1,
+    data.answers1.Tests
+  );
+  const tests = checkUndefined(data.answers1.Tests);
   const questionsHeading = checkUndefinedHeading(
-    optionsObj,
-    optionsObj.Questions
+    data.answers1,
+    data.answers1.Questions
   );
-  const questions = checkUndefined(optionsObj.Questions);
+  const questions = checkUndefined(data.answers1.Questions);
+  const tocHeading = tocCheck(tocInclude);
 
   return `
 # ${title}  
@@ -52,19 +52,19 @@ function generateMarkdown(data) {
 ![GitHub repo size](https://img.shields.io/github/repo-size/${user}/${repo})
 ![GitHub top language](https://img.shields.io/github/languages/top/${user}/${repo})  
 ${description}
-${tocHeading} 
+## ${tocHeading}
 ${toc}
-${installationHeading}
+## ${installationHeading}
 ${installation}
-${usageHeading}
+## ${usageHeading}
 ${usage}
-${lisenceHeading}
+## ${lisenceHeading}
 ${lisence}
-${contributingHeading}
+## ${contributingHeading}
 ${contributing}
-${testsHeading}
+## ${testsHeading}
 ${tests}
-${questionsHeading}
+## ${questionsHeading}
 ${questions}
 ### Click on profile picture below to see ${user}'s Github profile
 [![${user}'s Profile Picture](${profilePic}&s=200 "Created by ${user}")](https://github.com/${user})  
@@ -72,23 +72,37 @@ ${questions}
 ${email}
 `;
 
-  // run a function that checks if optionsObj is undefined. If not then sets the heading variable as the key
-  function checkUndefinedHeading(optionsObj, value) {
+  // run a function that checks if key is undefined. If not then sets the heading variable as the key
+  function checkUndefinedHeading(key, value) {
     if (JSON.stringify(value) === undefined) {
       return "";
     } else {
-      return (
-        "## " +
-        Object.keys(optionsObj)[Object.values(optionsObj).indexOf(value)]
-      );
+      return "- " + Object.keys(key)[Object.values(key).indexOf(value)];
     }
   }
+
   // run a function that checks if value is undefined. If not then sets the variable as the value
   function checkUndefined(value) {
     if (JSON.stringify(value) === undefined) {
       return "";
     } else {
       return value;
+    }
+  }
+
+  // checks if table of contents was selected or not and returns string for heading if so and also creates table oif contents variable if required
+  function tocCheck(value) {
+    toc = "";
+    if (value) {
+      toc = `${installationHeading}
+${usageHeading}
+${lisenceHeading}
+${contributingHeading}
+${testsHeading}
+${questionsHeading}`;
+      return "- Table of Contents";
+    } else {
+      return "";
     }
   }
 }

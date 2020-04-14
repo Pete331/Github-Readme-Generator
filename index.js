@@ -1,12 +1,8 @@
 const fs = require("fs");
-const api = require("./utils/api.js");
+const questionsForReadme = require("./utils/questionsForReadme.js");
 const generateMarkdown = require("./utils/generateMarkdown.js");
 const axios = require("axios");
 const inquirer = require("inquirer");
-
-const questions = [];
-
-function writeToFile(fileName, data) {}
 
 // the main async function that goes through the repos, and asks specific questions
 async function init() {
@@ -26,18 +22,9 @@ async function init() {
     const repoArray = repoResponse.data.map((repo) => repo.name);
     // console.log(repoArray);
 
-    // run the questions1 function and stores response in a checkbox Array for what to include in README
-    const answers1 = await askQuestions1(repoArray);
-    const checkboxArray = answers1.checkboxoptions;
-    // console.log(checkboxArray);
-
-    // creates checkboxArray and adds the selected checkboxoptions to it that were selected
-    for (let i = 0; i < checkboxArray.length; i++) {
-      checkboxArray[i] = await askQuestions2(checkboxArray[i]);
-      //   toPrintArray.push(checkboxArray[i]);
-    }
-    // console.log(userInfo);
-    // console.log(answers1.checkboxoptions);
+    // run the questionsForReadme function and stores response in an answers1 variable
+    const answers1 = await questionsForReadme(repoArray);
+    // console.log(answers1);
 
     // store required responses in object
     const userInfo = {
@@ -50,7 +37,7 @@ async function init() {
     // creates directory to save README.md file in
     fs.mkdir(`./${user.username}(${answers1.repo})`, function (err) {
       if (err) {
-        throw err;
+        console.log("You have a directory with the same name already, you have just overwritten the directory");
       }
     });
     // creates README.md file
@@ -59,7 +46,7 @@ async function init() {
       generateMarkdown(userInfo),
       function (err) {
         if (err) {
-          throw err;
+          console.log("You have a filename with the same name already, you have just overwritten the README.md file")
         }
         console.log("you have saved the README.md :)");
       }
@@ -77,110 +64,6 @@ function askUser() {
     message: "Enter your GitHub username",
     name: "username",
   });
-}
-
-//   next lot of questions asks what to include in readme
-function askQuestions1(repoArray) {
-  return inquirer.prompt([
-    {
-      type: "list",
-      message: "Which repo would you like to create a README.md for?",
-      name: "repo",
-      choices: repoArray,
-    },
-    {
-      type: "input",
-      message: "What Would you like the Title to be?",
-      name: "Title",
-    },
-    {
-      type: "input",
-      message: "Add a decription:",
-      name: "Description",
-    },
-    {
-      type: "checkbox",
-      message:
-        "Which of the following would you like included in your README.md file?",
-      name: "checkboxoptions",
-      choices: [
-        "Table of Contents",
-        "Installation",
-        "Usage",
-        "License",
-        "Contributing",
-        "Tests",
-        "Questions",
-      ],
-    },
-  ]);
-}
-
-// tailered lot of questions depending on what the user selected to include
-function askQuestions2(checkboxArray) {
-  if (checkboxArray.includes("Table of Contents")) {
-    return inquirer.prompt([
-      {
-        type: "input",
-        message: `What would you like in your Table of Contents?`,
-        name: "Table of Contents",
-      },
-    ]);
-  }
-  if (checkboxArray.includes("Installation")) {
-    return inquirer.prompt([
-      {
-        type: "input",
-        message: `What would you like in your Installation?`,
-        name: "Installation",
-      },
-    ]);
-  }
-  if (checkboxArray.includes("Usage")) {
-    return inquirer.prompt([
-      {
-        type: "input",
-        message: `What would you like in your Usage?`,
-        name: "Usage",
-      },
-    ]);
-  }
-  if (checkboxArray.includes("License")) {
-    return inquirer.prompt([
-      {
-        type: "input",
-        message: `What would you like in your License?`,
-        name: "License",
-      },
-    ]);
-  }
-  if (checkboxArray.includes("Contributing")) {
-    return inquirer.prompt([
-      {
-        type: "input",
-        message: `What would you like in your Contributing?`,
-        name: "Contributing",
-      },
-    ]);
-  }
-  if (checkboxArray.includes("Tests")) {
-    return inquirer.prompt([
-      {
-        type: "input",
-        message: `What would you like in your Tests?`,
-        name: "Tests",
-      },
-    ]);
-  }
-  if (checkboxArray.includes("Questions")) {
-    return inquirer.prompt([
-      {
-        type: "input",
-        message: `What would you like in your Questions?`,
-        name: "Questions",
-      },
-    ]);
-  }
 }
 
 init();
