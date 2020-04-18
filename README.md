@@ -1,9 +1,11 @@
+This is the first project that I have created using node.js.
+Axios was used to get an API response from the github API to receive the users repo's, profile picture and email address. Inquirer was used to ask the user a series of questions to populate the README.md file.
 
-If you would like to see a video of the appliaction working look here:
+If you would like to see a video of the application working click the below link:  
 https://drive.google.com/open?id=1A3tOuVvKhSJLwjCTqGY17e72HO9q_9sy
 
 ----------------------------------------------------------------------------------------------------------------------------------------
-Below is the response from the application------
+Below is the output from the application generated for this repo------
 
 # Github-Readme-Generator
 This application will generate a README.md file after receiving user inputs and create table of contents accordingly  
