@@ -55,9 +55,16 @@ function questionsForReadme(repoArray) {
       },
     },
     {
-      type: "input",
+      type: "list",
       message: `What would you like in your License?`,
       name: "License",
+      choices: [
+        "MIT License",
+        "Apache License 2.0",
+        "GNU General Public License",
+        "None",
+        "Other",
+      ],
       when: function (answers) {
         return answers.checkboxoptions.includes("License");
       },

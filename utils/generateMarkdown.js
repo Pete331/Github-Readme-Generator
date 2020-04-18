@@ -4,7 +4,7 @@ function generateMarkdown(data) {
   // sets all the variables that will be displayed in the markdown file
   const user = data.user;
   const repo = data.answers1.repo;
-  const email = data.email;
+  const email = checkEmail(data.email);
   const profilePic = data.profilePic;
   // stores a boolean variable - if table of contents is selected or not
   const tocInclude = data.answers1.checkboxoptions.includes(
@@ -46,25 +46,25 @@ function generateMarkdown(data) {
   const tocHeading = tocCheck(tocInclude);
 
   return `
-# ${title}  
+# ${title}
+${description}  
 ![GitHub last commit](https://img.shields.io/github/last-commit/${user}/${repo})
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/y/${user}/${repo})
 ![GitHub repo size](https://img.shields.io/github/repo-size/${user}/${repo})
 ![GitHub top language](https://img.shields.io/github/languages/top/${user}/${repo})  
-${description}
 ## ${tocHeading}
 ${toc}
-## ${installationHeading}
+## ${installationHeading.substring(2)}
 ${installation}
-## ${usageHeading}
+## ${usageHeading.substring(2)}
 ${usage}
-## ${lisenceHeading}
+## ${lisenceHeading.substring(2)}
 ${lisence}
-## ${contributingHeading}
+## ${contributingHeading.substring(2)}
 ${contributing}
-## ${testsHeading}
+## ${testsHeading.substring(2)}
 ${tests}
-## ${questionsHeading}
+## ${questionsHeading.substring(2)}
 ${questions}
 ### Click on profile picture below to see ${user}'s Github profile
 [![${user}'s Profile Picture](${profilePic}&s=200 "Created by ${user}")](https://github.com/${user})  
@@ -73,6 +73,7 @@ ${email}
 `;
 
   // run a function that checks if key is undefined. If not then sets the heading variable as the key
+  // a bullet is added to the heading so that the contents page is formatted correctly - the first 2 characters are removed from the headings above so they don't have the bullets
   function checkUndefinedHeading(key, value) {
     if (JSON.stringify(value) === undefined) {
       return "";
@@ -90,7 +91,7 @@ ${email}
     }
   }
 
-  // checks if table of contents was selected or not and returns string for heading if so and also creates table oif contents variable if required
+  // checks if table of contents was selected or not and returns string for heading if so and also creates table of contents variable if required
   function tocCheck(value) {
     toc = "";
     if (value) {
@@ -100,10 +101,15 @@ ${lisenceHeading}
 ${contributingHeading}
 ${testsHeading}
 ${questionsHeading}`;
-      return "- Table of Contents";
+      return "Table of Contents";
     } else {
       return "";
     }
+  }
+  // checks to see if email is returned from Github and if null shows nothing rather than null
+  function checkEmail(email) {
+    if (email === "null");
+    return "";
   }
 }
 
